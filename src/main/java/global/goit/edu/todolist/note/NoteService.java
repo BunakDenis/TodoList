@@ -4,12 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
-
-import static java.util.Collections.copy;
 
 @Service
 @RequiredArgsConstructor
@@ -19,8 +15,7 @@ public class NoteService {
     private final AtomicLong id = new AtomicLong();
 
     private long generateId() {
-        long result = id.addAndGet(1L);
-        return result;
+        return id.addAndGet(1L);
     }
 
     public Note add(Note note) {
@@ -30,17 +25,13 @@ public class NoteService {
     }
 
     public Note getById(long id) {
-        Note result = new Note();
 
         int noteIndexInDb = findNoteById(id);
 
         if (noteIndexInDb == -1) {
             throw new IllegalArgumentException("Note with id=" + id + " not found.");
         }
-
-        result = notesDb.get(noteIndexInDb);
-
-        return result;
+        return notesDb.get(noteIndexInDb);
     }
 
     private int findNoteById(long id) {
@@ -71,8 +62,7 @@ public class NoteService {
     }
 
     public List<Note> getAll() {
-        List<Note> result = List.copyOf(notesDb);
-        return result;
+        return List.copyOf(notesDb);
     }
 
     public void delete(long id) {
