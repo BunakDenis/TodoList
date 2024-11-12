@@ -1,0 +1,23 @@
+[
+  {"id" : 1,
+    "title" : "Do Androids Dream of Electric Sheep?",
+    "content" : "It was January 2021, and Rick Deckard had a license to kill. Somewhere among the hordes of humans out there, lurked several rogue androids. Deckard's assignment--find them and then...\"retire\" them. Trouble was, the androids all looked exactly like humans, and they didn't want to be found!"
+    },
+    {"id" : 2,
+      "title" : "The Hitchhiker’s Guide to the Galaxy",
+      "content" : "Seconds before the Earth is demolished to make way for a galactic freeway, Arthur Dent is plucked off the planet by his friend Ford Prefect, a researcher for the revised edition of The Hitchhiker's Guide to the Galaxy who, for the last fifteen years, has been posing as an out-of-work actor.\n"
+    },
+    {"id" : 3,
+      "title" : "Something Wicked This Way Comes",
+      "content" : "One of Ray Bradbury’s best-known and most popular novels, Something Wicked This Way Comes, now featuring a new introduction and material about its longstanding influence on culture and genre."
+    },
+    {"id" : 4,
+      "title" : "A Story of Yesterday",
+      "content" : "A Story of Yesterday is a concise and straight punch to the jaw of life.\nUnder a sky of different colors germinates a magical story of survival, where the result of each choice, enclosed in this particular tale, will snatch the whereabouts of each story forever."
+    },
+    {
+      "id": 5,
+      "title": "To Kill a Mockingbird",
+      "content": "The unforgettable novel of a childhood in a sleepy Southern town and the crisis of conscience that rocked it. \"To Kill A Mockingbird\" became both an instant bestseller and a critical success when it was first published in 1960. It went on to win the Pulitzer Prize in 1961 and was later made into an Academy Award-winning film, also a classic."
+    }
+    ]

@@ -1,5 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Note</title>
+  </head>
   <style>
     h1 {
       font-size: 30px;
@@ -19,8 +24,6 @@
     }
 
     .controll-buttons {
-      background: -webkit-linear-gradient(left, #25c481, #25b7c4);
-      background: linear-gradient(to right, #25c481, #25b7c4);
       font-family: "Roboto", sans-serif;
     }
 
@@ -36,10 +39,14 @@
       min-width: 120px;
     }
 
+    .controll-buttons input:hover {
+      background-color: #12d2e4;
+    }
+
     .submit-button {
       font-family: "Roboto", sans-serif;
       margin-top: 25px;
-      background-color: #0e8d58;
+      background-color: #25b7c4;
       color: #fff;
       border: none;
       border-radius: 10px;
@@ -50,7 +57,7 @@
     }
 
     .submit-button:hover {
-      background-color: #12b873;
+      background-color: #12d2e4;
     }
 
     table {
@@ -61,7 +68,7 @@
       background-color: rgba(255, 255, 255, 0.3);
     }
     .tbl-content {
-      height: 200px;
+      height: 300px;
       overflow-x: auto;
       margin-top: 0px;
       border: 1px solid rgba(255, 255, 255, 0.3);
@@ -93,6 +100,29 @@
     td > input {
       width: 100%;
     }
+    td > textarea {
+      font-family: "Roboto", sans-serif;
+      width: 100%;
+      font-weight: 300;
+      font-size: 12px;
+      color: black;
+      border-bottom: solid 1px rgba(255, 255, 255, 0.1);
+    }
+    .edit-button {
+      margin-top: 10px;
+      background-color: #25b7c4;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 5px;
+      min-height: 20px;
+      min-width: 120px;
+    }
+
+    .edit-button:hover {
+      background-color: #12d2e4;
+    }
 
     /* demo styles */
 
@@ -106,34 +136,6 @@
       margin: 50px;
     }
   </style>
-  <script>
-    var xhr = new XMLHttpRequest();
-
-    const url = "/note/edit";
-
-    function editNote() {
-      xhr.open("POST", url, true);
-      xhr.setRequestHeader("Content-Type", "application/json");
-      xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-          var json = JSON.parse(xhr.responseText);
-          console.log(json.email + ", " + json.password);
-        }
-      };
-      let form = document.getElementById("editForm");
-      let formData = {};
-      for (let i = 0; i < form.elements.length; i++) {
-        let element = form.elements[i];
-        if (element.type !== "submit") {
-          formData[element.name] = element.value;
-        }
-      }
-      var data = JSON.stringify({
-        formData,
-      });
-      xhr.send(data);
-    }
-  </script>
   <body>
     <section>
       <h2>Note details</h2>
@@ -142,21 +144,26 @@
           <input class="btn btn-primary mt-3" type="submit" value="Home" />
         </form>
       </div>
-      <form class="editForm" action="/note/edit" method="post">
+      <form
+        class="editForm"
+        th:action="@{/note/edit}"
+        method="post"
+        th:object="${note}"
+      >
         <div class="tbl-content">
           <table cellpadding="0" cellspacing="0" border="0">
             <tbody>
               <tr>
-                <td>Note Id:</td>
                 <td>
-                  <p
-                    th:text="${note.id}"
+                  <input
+                    type="hidden"
+                    id="id"
                     class="form-control"
-                    id="note-id"
                     name="id"
-                  >
-                    id
-                  </p>
+                    value=""
+                    th:value="${note.id}"
+                    th:field="*{id}"
+                  />
                 </td>
               </tr>
               <tr>
@@ -169,34 +176,31 @@
                     name="title"
                     value=""
                     th:value="${note.title}"
+                    field="*{title}"
                   />
                 </td>
               </tr>
               <tr>
                 <td>Content:</td>
                 <td>
-                  <input
+                  <textarea
+                    rows="8"
+                    cols="50"
                     type="text"
                     id="content"
                     class="form-control"
                     name="content"
-                    value=""
-                    th:value="${note.content}"
-                  />
+                    th:text="${note.content}"
+                    field="*{content}"
+                  >
+                  </textarea>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
+        <button class="edit-button" id="edit" type="submit">Edit</button>
       </form>
-      <button
-        type="submit"
-        class="submit-button"
-        id="submit-button"
-        onclick="editNote()"
-      >
-        Edit
-      </button>
     </section>
   </body>
 </html>

@@ -34,7 +34,7 @@ public class NoteService {
         return notesDb.get(noteIndexInDb);
     }
 
-    private int findNoteById(long id) {
+    public int findNoteById(long id) {
         int result = -1;
 
         for (int i = 0; i < notesDb.size(); i++) {
@@ -48,16 +48,11 @@ public class NoteService {
 
     public void update(Note note) {
 
-        if (notesDb.contains(note)) {
-
-            notesDb.forEach(
-                    n -> {
-                        if (n.equals(note)) {
-                            n.setTitle(note.getTitle());
-                            n.setContent(note.getContent());
-                        }
-                    }
-            );
+        for (Note noteDB : notesDb) {
+            if (noteDB.getId() == note.getId()) {
+                noteDB.setTitle(note.getTitle());
+                noteDB.setContent(note.getContent());
+            }
         }
     }
 
