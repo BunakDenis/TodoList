@@ -11,12 +11,13 @@ import lombok.*;
 @Table(name = "note")
 public class Note {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "title")
+    @Column(name = "title", length = 1000)
     private String title;
 
+    @Lob
     @Column(name = "content")
     private String content;
 }

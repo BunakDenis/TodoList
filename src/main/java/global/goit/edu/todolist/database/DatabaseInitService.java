@@ -8,8 +8,8 @@ public class DatabaseInitService {
         Flyway flyway = Flyway.configure()
                 .dataSource(
                         "jdbc:h2:./src/main/resources/db/todolist",
-                        null,
-                        null
+                        "admin",
+                        "admin"
                 )
                 .load();
         flyway.migrate();

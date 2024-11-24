@@ -1,6 +1,7 @@
 package global.goit.edu.todolist.note;
 
 import global.goit.edu.todolist.repository.NoteRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
