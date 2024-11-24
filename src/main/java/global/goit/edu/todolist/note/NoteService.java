@@ -1,72 +1,36 @@
 package global.goit.edu.todolist.note;
 
+import global.goit.edu.todolist.repository.NoteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class NoteService {
 
-    private final List<Note> notesDb = new ArrayList<>();
-    private final AtomicLong id = new AtomicLong();
+    private final NoteRepository noteRepository;
 
-    private long generateId() {
-        return id.addAndGet(1L);
-    }
-
-    public Note add(Note note) {
-        note.setId(generateId());
-        notesDb.add(note);
-        return note;
-    }
-
-    public Note getById(long id) {
-
-        int noteIndexInDb = findNoteById(id);
-
-        if (noteIndexInDb == -1) {
-            throw new IllegalArgumentException("Note with id=" + id + " not found.");
-        }
-        return notesDb.get(noteIndexInDb);
-    }
-
-    public int findNoteById(long id) {
-        int result = -1;
-
-        for (int i = 0; i < notesDb.size(); i++) {
-            if (notesDb.get(i).getId() == id) {
-                result = i;
-                break;
-            }
-        }
-        return result;
-    }
-
-    public void update(Note note) {
-
-        for (Note noteDB : notesDb) {
-            if (noteDB.getId() == note.getId()) {
-                noteDB.setTitle(note.getTitle());
-                noteDB.setContent(note.getContent());
-            }
-        }
+    public Note save(Note note) {
+        note.setId(0);
+        return noteRepository.save(note);
     }
 
     public List<Note> getAll() {
-        return List.copyOf(notesDb);
+        return noteRepository.findAll();
     }
 
-    public void delete(long id) {
+    public Note getById(long id) {
+        Optional<Note> result = noteRepository.findById(String.valueOf(id));
 
-        int noteIdInDb = findNoteById(id);
-
-        if (noteIdInDb == -1) {
-            throw new IllegalArgumentException("Note with id=" + id + " not found.");
-        }
-        notesDb.remove(noteIdInDb);
+        return result.get();
     }
+
+    public void delete(Note note) {
+        noteRepository.delete(note);
+    }
+
+
 }

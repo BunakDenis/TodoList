@@ -1,4 +1,4 @@
-package global.goit.edu.todolist.controllers;
+package global.goit.edu.todolist.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,17 +1,13 @@
-package global.goit.edu.todolist.controllers;
+package global.goit.edu.todolist.controller;
 
-import com.google.gson.reflect.TypeToken;
 import global.goit.edu.todolist.note.Note;
 import global.goit.edu.todolist.note.NoteService;
-import global.goit.edu.todolist.reader.FileReader;
-import global.goit.edu.todolist.reader.JsonFileReader;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -23,16 +19,7 @@ public class NoteController {
 
     @PostConstruct
     public void init() {
-        FileReader jsonFileReader = new JsonFileReader();
-
-        ArrayList<Note> read = jsonFileReader.read(
-                "./src/main/resources/json/population.json",
-                new TypeToken<ArrayList<Note>>() {}.getType()
-        );
-
-        for (Note note : read) {
-            noteService.add(note);
-        }
+        //DatabaseInitService.main(null);
     }
 
     @GetMapping("/list")
@@ -46,7 +33,8 @@ public class NoteController {
 
     @PostMapping("/delete/{id}")
     public ModelAndView deleteById(@PathVariable long id) {
-        noteService.delete(id);
+        Note note = noteService.getById(id);
+        noteService.delete(note);
 
         RedirectView redirectView = new RedirectView("/note/list");
         return new ModelAndView(redirectView);
@@ -64,8 +52,8 @@ public class NoteController {
     @PostMapping("/edit")
     public ModelAndView editNote(@ModelAttribute("note") Note note) {
 
-        if (noteService.findNoteById(note.getId()) != -1) {
-            noteService.update(note);
+        if (noteService.getById(note.getId()) != null) {
+            noteService.save(note);
         }
 
         RedirectView redirectView = new RedirectView("/note/list");
@@ -75,9 +63,9 @@ public class NoteController {
 
     @PostMapping("/add")
     public ModelAndView addNote(@ModelAttribute("note") Note note) {
-
+        System.out.println("note = " + note);
         if (note != null) {
-            noteService.add(note);
+            noteService.save(note);
         }
 
         RedirectView redirectView = new RedirectView("/note/list");
