@@ -1,7 +1,6 @@
 package global.goit.edu.todolist.note;
 
 import global.goit.edu.todolist.repository.NoteRepository;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +14,6 @@ public class NoteService {
     private final NoteRepository noteRepository;
 
     public Note save(Note note) {
-        note.setId(0);
         return noteRepository.save(note);
     }
 
@@ -32,6 +30,5 @@ public class NoteService {
     public void delete(Note note) {
         noteRepository.delete(note);
     }
-
 
 }

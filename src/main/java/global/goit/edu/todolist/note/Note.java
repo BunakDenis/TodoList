@@ -11,13 +11,16 @@ import lombok.*;
 @Table(name = "note")
 public class Note {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(
+            name = "note_seq_generator",
+            sequenceName = "NOTE_SEQ"
+    )
     private long id;
 
-    @Column(name = "title", length = 1000)
+    @Column(name = "title", length = 256)
     private String title;
 
-    @Lob
-    @Column(name = "content")
+    @Column(name = "content", columnDefinition = "CLOB")
     private String content;
 }

@@ -2,7 +2,6 @@ package global.goit.edu.todolist.controller;
 
 import global.goit.edu.todolist.note.Note;
 import global.goit.edu.todolist.note.NoteService;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -16,11 +15,6 @@ import java.util.List;
 public class NoteController {
 
     private final NoteService noteService;
-
-    @PostConstruct
-    public void init() {
-        //DatabaseInitService.main(null);
-    }
 
     @GetMapping("/list")
     public ModelAndView getList() {

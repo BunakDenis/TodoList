@@ -1,1 +1,0 @@
-ALTER TABLE note ALTER COLUMN content CLOB;
