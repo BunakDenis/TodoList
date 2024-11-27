@@ -1,4 +1,4 @@
-package global.goit.edu.todolist.note;
+package global.goit.edu.todolist.model.note;
 
 import jakarta.persistence.*;
 import lombok.*;

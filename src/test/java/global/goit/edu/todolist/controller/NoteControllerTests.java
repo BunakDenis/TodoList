@@ -1,7 +1,7 @@
 package global.goit.edu.todolist.controller;
 
-import global.goit.edu.todolist.note.Note;
-import global.goit.edu.todolist.note.NoteService;
+import global.goit.edu.todolist.model.note.Note;
+import global.goit.edu.todolist.model.service.NoteService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;

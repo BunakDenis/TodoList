@@ -1,7 +1,7 @@
 package global.goit.edu.todolist.controller;
 
-import global.goit.edu.todolist.note.Note;
-import global.goit.edu.todolist.note.NoteService;
+import global.goit.edu.todolist.model.note.Note;
+import global.goit.edu.todolist.model.service.NoteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;

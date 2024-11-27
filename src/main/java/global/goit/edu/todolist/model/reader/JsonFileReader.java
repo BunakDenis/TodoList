@@ -1,17 +1,12 @@
-package global.goit.edu.todolist.reader;
+package global.goit.edu.todolist.model.reader;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.type.ArrayType;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
-import java.util.StringJoiner;
 
 public class JsonFileReader implements FileReader {
     @Override

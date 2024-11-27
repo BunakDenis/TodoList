@@ -1,4 +1,4 @@
-package global.goit.edu.todolist.reader;
+package global.goit.edu.todolist.model.reader;
 
 import java.util.ArrayList;
 import java.lang.reflect.Type;

@@ -1,6 +1,7 @@
-package global.goit.edu.todolist.note;
+package global.goit.edu.todolist.model.service;
 
-import global.goit.edu.todolist.repository.NoteRepository;
+import global.goit.edu.todolist.controller.repository.NoteRepository;
+import global.goit.edu.todolist.model.note.Note;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,10 @@ public class NoteService {
 
     public Note getById(long id) {
         Optional<Note> result = noteRepository.findById(String.valueOf(id));
+
+        if (!result.isPresent()) {
+            throw new IllegalArgumentException("Note with id=" + id + " not found");
+        }
 
         return result.get();
     }

@@ -1,4 +1,4 @@
-package global.goit.edu.todolist.database;
+package global.goit.edu.todolist.controller.database;
 
 import org.flywaydb.core.Flyway;
 
