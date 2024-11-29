@@ -24,12 +24,15 @@ public class NoteControllerTests {
     @Autowired
     MockMvc mvc;
 
+    @Autowired
+    private NoteController noteController;
+
     @MockBean
-    NoteService noteService;
+    NoteService mockNoteService;
 
     @Test
     public void testThatMethodGetListWorkOk() throws Exception {
-        Mockito.when(noteService.getAll()).thenReturn(getNotes());
+        Mockito.when(mockNoteService.getAll()).thenReturn(getNotes());
 
         mvc.perform(get("/note/list"))
                 .andExpect(status().isOk())
@@ -105,7 +108,7 @@ public class NoteControllerTests {
 
     @Test
     public void testThatMethodDeleteWorkOk() throws Exception {
-        Mockito.when(noteService.getById(1L)).thenReturn(getNotes().get(0));
+        Mockito.when(mockNoteService.getById(1L)).thenReturn(getNotes().get(0));
 
         mvc.perform(post("/note/delete/1"))
                 .andExpect(status().is3xxRedirection())
@@ -115,7 +118,7 @@ public class NoteControllerTests {
 
     @Test
     public void testThatMethodEditNotePageWorkOk() throws Exception {
-        Mockito.when(noteService.getById(getNotes().get(0).getId())).thenReturn(getNotes().get(0));
+        Mockito.when(mockNoteService.getById(getNotes().get(0).getId())).thenReturn(getNotes().get(0));
 
         mvc.perform(get("/note/edit/1"))
                 .andExpect(status().isOk())
@@ -153,7 +156,7 @@ public class NoteControllerTests {
                 .content("Water is the more useful liquid than bear")
                 .build();
 
-        Mockito.when(noteService.save(note)).thenReturn(note);
+        Mockito.when(mockNoteService.save(note)).thenReturn(note);
 
         RequestBuilder request = post("/note/add")
                 .param("id", String.valueOf(5L))

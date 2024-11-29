@@ -57,7 +57,7 @@ public class NoteController {
 
     @PostMapping("/add")
     public ModelAndView addNote(@ModelAttribute("note") Note note) {
-        System.out.println("note = " + note);
+
         if (note != null) {
             noteService.save(note);
         }
