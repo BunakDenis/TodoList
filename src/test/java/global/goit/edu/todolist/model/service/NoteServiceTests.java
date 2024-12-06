@@ -1,7 +1,7 @@
 package global.goit.edu.todolist.model.service;
 
 import global.goit.edu.todolist.TodoListTestBaseClass;
-import global.goit.edu.todolist.model.note.Note;
+import global.goit.edu.todolist.model.entity.note.Note;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.annotation.Rollback;

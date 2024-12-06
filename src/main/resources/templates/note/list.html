@@ -47,6 +47,7 @@
     }
 
     section > .btn-primary {
+      float: left;
       background-color: #25b7c4;
     }
 
@@ -109,6 +110,24 @@
       color: #c7b6b6;
     }
 
+    .logout-button {
+      float: right;
+      background: none !important;
+      border: none;
+      padding: 0 !important;
+      /*optional*/
+      font-family: arial, sans-serif;
+      font-size: 15px;
+      /*input has OS specific font-family*/
+      color: white;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .logout-button:hover {
+      color: blue;
+    }
+
     /* demo styles */
 
     @import url(https://fonts.googleapis.com/css?family=Roboto:400,500,300,700);
@@ -145,19 +164,26 @@
   </script>
   <body>
     <section>
+      <div class="logout_container">
+        <form method="post" th:action="@{/note/logout}">
+          <button type="submit" class="logout-button">Log out</button>
+        </form>
+      </div>
       <h2>Note list</h2>
 
       <!-- Button trigger modal -->
-      <button
-        type="button"
-        class="btn btn-primary"
-        data-bs-toggle="modal"
-        data-bs-target="#exampleModal"
-        style="width: 100px"
-      >
-        Add note
-      </button>
 
+      <div th:if="${role}">
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-bs-toggle="modal"
+          data-bs-target="#exampleModal"
+          style="width: 100px"
+        >
+          Add note
+        </button>
+      </div>
       <!-- Modal -->
       <form
         class="addForm"
@@ -232,8 +258,8 @@
             <tr>
               <th>Title</th>
               <th>Content</th>
-              <th></th>
-              <th></th>
+              <th th:if="${role}"></th>
+              <th th:if="${role}"></th>
             </tr>
           </thead>
         </table>
@@ -244,7 +270,7 @@
             <tr th:each="note: ${notes}">
               <td th:text="${note.title}">Mystic Practices</td>
               <td class="note-content" th:text="${note.content}">Vipasana</td>
-              <td>
+              <td th:if="${role}">
                 <form
                   method="get"
                   th:action="@{/note/edit/{id}(id = ${note.id})}"
@@ -259,7 +285,7 @@
                   </button>
                 </form>
               </td>
-              <td>
+              <td th:if="${role}">
                 <form
                   method="post"
                   th:action="@{/note/delete/{id}(id = ${note.id})}"

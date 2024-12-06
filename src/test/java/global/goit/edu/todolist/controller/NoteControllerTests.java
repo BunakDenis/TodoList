@@ -1,6 +1,6 @@
 package global.goit.edu.todolist.controller;
 
-import global.goit.edu.todolist.model.note.Note;
+import global.goit.edu.todolist.model.entity.note.Note;
 import global.goit.edu.todolist.model.service.NoteService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -25,6 +25,9 @@ public class NoteControllerTests {
     MockMvc mvc;
 
     @Autowired
+    NoteService noteService;
+
+    @Autowired
     private NoteController noteController;
 
     @MockBean
@@ -33,7 +36,8 @@ public class NoteControllerTests {
     @Test
     public void testThatMethodGetListWorkOk() throws Exception {
         Mockito.when(mockNoteService.getAll()).thenReturn(getNotes());
-
+        List<Note> all = noteService.getAll();
+        all.forEach(System.out::println);
         mvc.perform(get("/note/list"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("note/list"))

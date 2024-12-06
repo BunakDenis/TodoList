@@ -1,12 +1,21 @@
 package global.goit.edu.todolist.controller;
 
-import global.goit.edu.todolist.model.note.Note;
+import global.goit.edu.todolist.model.entity.note.Note;
 import global.goit.edu.todolist.model.service.NoteService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -17,10 +26,17 @@ public class NoteController {
     private final NoteService noteService;
 
     @GetMapping("/list")
-    public ModelAndView getList() {
+    public ModelAndView getList(HttpServletRequest request, HttpServletResponse response) {
         ModelAndView result = new ModelAndView("note/list");
 
+        SecurityContext context = SecurityContextHolder.getContext();
+        User principal = (User) context.getAuthentication().getPrincipal();
+        System.out.println("principal.getUsername() = " + principal.getUsername());
+        Collection<? extends GrantedAuthority> authorities = context.getAuthentication().getAuthorities();
+        boolean isAdmin = authorities.stream().anyMatch(a -> a.getAuthority().equals("admin"));
+
         List<Note> notes = noteService.getAll();
+        result.addObject("role", isAdmin);
         result.addObject("notes", notes);
         return result;
     }
@@ -65,5 +81,18 @@ public class NoteController {
         RedirectView redirectView = new RedirectView("/note/list");
 
         return new ModelAndView(redirectView);
+    }
+
+    @PostMapping ("/logout")
+    public ModelAndView logout(Authentication authentication, HttpServletRequest request, HttpServletResponse response) {
+
+        SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
+
+        logoutHandler.logout(request, response, authentication);
+
+        RedirectView redirectView = new RedirectView("/login");
+
+        return new ModelAndView(redirectView);
+
     }
 }

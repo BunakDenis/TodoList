@@ -4,3 +4,7 @@ INSERT INTO note (title, content) VALUES
 ('Something Wicked This Way Comes', 'One of Ray Bradbury’s best-known and most popular novels, Something Wicked This Way Comes, now featuring a new introduction and material about its longstanding influence on culture and genre.'),
 ('A Story of Yesterday', 'A Story of Yesterday is a concise and straight punch to the jaw of life.Under a sky of different colors germinates a magical story of survival, where the result of each choice, enclosed in this particular tale, will snatch the whereabouts of each story forever.'),
 ('To Kill a Mockingbird', 'The unforgettable novel of a childhood in a sleepy Southern town and the crisis of conscience that rocked it. To Kill A Mockingbird became both an instant bestseller and a critical success when it was first published in 1960. It went on to win the Pulitzer Prize in 1961 and was later made into an Academy Award-winning film, also a classic.');
+
+INSERT INTO users (username, password, enabled, role) VALUES
+('user', '{noop}jdbcDefault', 'true', 'ADMIN'),
+('guess', '{noop}default', 'true', 'USER');
