@@ -1,57 +1,64 @@
 package global.goit.edu.todolist.controller.filter;
 
 import global.goit.edu.todolist.model.entity.user.User;
+import global.goit.edu.todolist.model.service.CookieService;
 import global.goit.edu.todolist.model.service.JwtService;
 import global.goit.edu.todolist.model.service.UserService;
 import jakarta.servlet.*;
+import jakarta.servlet.annotation.WebFilter;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-
-import static global.goit.edu.todolist.controller.filter.JwtAuthenticationFilter.BEARER_PREFIX;
+import java.util.Optional;
 
 @Data
 @Component
 @RequiredArgsConstructor
+@WebFilter("/note/**")
 @Order(1)
 public class JwtCreateTokenFilter implements Filter {
-
 
     private final JwtService jwtService;
 
     private final UserService userService;
 
+    private final CookieService cookieService;
+
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        System.out.println("Create token filter");
 
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
 
-        User currentUser = userService.getCurrentUser();
+        Optional<User> currentUser = Optional.ofNullable(userService.getCurrentUser());
+        System.out.println(currentUser);
 
         // Получаем токен из заголовка
-        var authHeader = httpServletRequest.getHeader(JwtAuthenticationFilter.HEADER_NAME);
-        if (StringUtils.isEmpty(authHeader) || !StringUtils.startsWith(authHeader, BEARER_PREFIX)) {
+        String token = cookieService.getToken(httpServletRequest.getCookies());
 
+        if (currentUser.isPresent()) {
+            User user = currentUser.get();
+            if (StringUtils.isEmpty(token)) {
+                System.out.println("Create token filter - create token");
+                String jwt = jwtService.generateToken(user);
 
-            var jwt = jwtService.generateToken(currentUser);
-            System.out.println("jwt = " + jwt);
-            httpServletResponse.addHeader(JwtAuthenticationFilter.HEADER_NAME, jwt);
+                Cookie cookie = new Cookie(JwtAuthenticationFilter.HEADER_NAME, jwt);
+                cookie.setMaxAge(JwtAuthenticationFilter.TOKEN_EXPIRATION);
+                cookie.setSecure(true);
+                cookie.setHttpOnly(true);
 
-            chain.doFilter(request, response);
+                httpServletResponse.addCookie(cookie);
+                //chain.doFilter(httpServletRequest, httpServletResponse);
+            }
         }
-
+        chain.doFilter(httpServletRequest, httpServletResponse);
     }
 }

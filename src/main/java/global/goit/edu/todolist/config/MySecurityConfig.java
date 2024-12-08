@@ -1,9 +1,7 @@
 package global.goit.edu.todolist.config;
 
 
-import global.goit.edu.todolist.controller.filter.CookieFilter;
 import global.goit.edu.todolist.controller.filter.JwtAuthenticationFilter;
-import global.goit.edu.todolist.controller.filter.JwtCreateTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,19 +19,12 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 public class MySecurityConfig {
 
-    @Autowired
     private final DataSource dataSource;
-    private final CookieFilter cookieFilter;
-    private final JwtCreateTokenFilter jwtCreateTokenFilter;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
 
-    public MySecurityConfig(DataSource dataSource, CookieFilter cookieFilter,
-                            JwtCreateTokenFilter jwtCreateTokenFilter,
-                            JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public MySecurityConfig(DataSource dataSource, JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.dataSource = dataSource;
-        this.cookieFilter = cookieFilter;
-        this.jwtCreateTokenFilter = jwtCreateTokenFilter;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
@@ -48,15 +39,13 @@ public class MySecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                //.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                //.addFilterAfter(jwtCreateTokenFilter, UsernamePasswordAuthenticationFilter.class)
-                .authorizeHttpRequests((authz) -> authz
+                .authorizeHttpRequests(auth -> auth
                         .anyRequest().authenticated()
                 )
                 .formLogin(withDefaults())
                 .logout(withDefaults())
-                .httpBasic(withDefaults());
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.formLogin().defaultSuccessUrl("/note/list", true);
         return http.build();
     }
-
 }

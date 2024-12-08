@@ -14,9 +14,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Configuration
 @EnableAutoConfiguration
 @EnableTransactionManagement
-@EnableJpaRepositories(basePackages = "global.goit.edu.todolist.controller.repository")
-@ComponentScan(basePackages = "global.goit.edu.todolist")
 public class MyAppConfiguration {
+/*
 
     private final JwtService jwtService;
 
@@ -38,5 +37,6 @@ public class MyAppConfiguration {
 
         return registrationBean;
     }
+*/
 
 }

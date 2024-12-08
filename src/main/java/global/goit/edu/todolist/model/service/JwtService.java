@@ -1,8 +1,10 @@
 package global.goit.edu.todolist.model.service;
 
+import global.goit.edu.todolist.controller.filter.JwtAuthenticationFilter;
 import global.goit.edu.todolist.model.entity.user.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.Locator;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -41,6 +43,7 @@ public class JwtService {
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         if (userDetails instanceof User customUserDetails) {
+            claims.put("id", customUserDetails.getId());
             claims.put("username", customUserDetails.getUsername());
             claims.put("role", customUserDetails.getRole());
         }
@@ -80,9 +83,11 @@ public class JwtService {
      * @return токен
      */
     private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        return Jwts.builder().setClaims(extraClaims).setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 100000 * 60 * 24))
+        return Jwts.builder()
+                .claims(extraClaims)
+                .subject(userDetails.getUsername())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + 1000 * JwtAuthenticationFilter.TOKEN_EXPIRATION))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256).compact();
     }
 

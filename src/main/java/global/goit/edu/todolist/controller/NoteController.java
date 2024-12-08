@@ -1,7 +1,10 @@
 package global.goit.edu.todolist.controller;
 
 import global.goit.edu.todolist.model.entity.note.Note;
+import global.goit.edu.todolist.model.entity.user.Role;
 import global.goit.edu.todolist.model.service.NoteService;
+import global.goit.edu.todolist.model.service.UserService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +12,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -24,16 +26,17 @@ import java.util.List;
 public class NoteController {
 
     private final NoteService noteService;
+    private final UserService userService;
 
     @GetMapping("/list")
     public ModelAndView getList(HttpServletRequest request, HttpServletResponse response) {
         ModelAndView result = new ModelAndView("note/list");
 
         SecurityContext context = SecurityContextHolder.getContext();
-        User principal = (User) context.getAuthentication().getPrincipal();
-        System.out.println("principal.getUsername() = " + principal.getUsername());
+
         Collection<? extends GrantedAuthority> authorities = context.getAuthentication().getAuthorities();
-        boolean isAdmin = authorities.stream().anyMatch(a -> a.getAuthority().equals("admin"));
+
+        boolean isAdmin = authorities.stream().anyMatch(a -> a.toString().equals(Role.ADMIN.toString()));
 
         List<Note> notes = noteService.getAll();
         result.addObject("role", isAdmin);

@@ -30,7 +30,7 @@ public class UserService {
      * @return созданный пользователь
      */
     public User create(User user) {
-        if (repository.existsByUserName(user.getUsername())) {
+        if (repository.existsByUsername(user.getUsername())) {
             // Заменить на свои исключения
             throw new IllegalArgumentException("Пользователь с таким именем уже существует");
         }
@@ -44,7 +44,18 @@ public class UserService {
      * @return пользователь
      */
     public User getByUsername(String username) {
-        return repository.findByUserName(username)
+        return repository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
+
+    }
+
+    /**
+     * Получение пользователя по id пользователя
+     *
+     * @return пользователь
+     */
+    public User getByUserId(int id) {
+        return repository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
 
     }
@@ -67,7 +78,13 @@ public class UserService {
      */
     public User getCurrentUser() {
         // Получение имени пользователя из контекста Spring Security
-        var username = SecurityContextHolder.getContext().getAuthentication().getName();
-        return getByUsername(username);
+        try {
+            var username = SecurityContextHolder.getContext().getAuthentication().getName();
+            return getByUsername(username);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
     }
 }
