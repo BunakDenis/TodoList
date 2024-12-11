@@ -1,19 +1,18 @@
 package global.goit.edu.todolist.model.service;
 
-import global.goit.edu.todolist.controller.filter.JwtAuthenticationFilter;
+
 import global.goit.edu.todolist.model.entity.user.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.Locator;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cglib.core.internal.Function;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +21,11 @@ import java.util.Map;
 @Service
 public class JwtService {
 
-    private static final String JWT_SIGNING_KEY = "53A73E5F1C4E0A2D3B5F2D784E6A1B423D6F247D1F6E5C3A596D635A75327855";
+    @Value("${token.signing.key}")
+    private String key;
+
+    @Value("${token.expiration}")
+    public int tokenExpiration;
 
     /**
      * Извлечение имени пользователя из токена
@@ -31,6 +34,7 @@ public class JwtService {
      * @return имя пользователя
      */
     public String extractUserName(String token) {
+        //System.out.println("Extract user name with token - " + token);
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -59,7 +63,7 @@ public class JwtService {
      */
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String userName = extractUserName(token);
-        return (userName.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
     /**
@@ -83,12 +87,14 @@ public class JwtService {
      * @return токен
      */
     private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+
         return Jwts.builder()
-                .claims(extraClaims)
                 .subject(userDetails.getUsername())
+                .claims(extraClaims)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * JwtAuthenticationFilter.TOKEN_EXPIRATION))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256).compact();
+                .expiration(new Date(System.currentTimeMillis() + tokenExpiration))
+                .signWith(getSigningKey())
+                .compact();
     }
 
     /**
@@ -118,8 +124,12 @@ public class JwtService {
      * @return данные
      */
     private Claims extractAllClaims(String token) {
-        return Jwts.parser().setSigningKey(getSigningKey()).build().parseClaimsJws(token)
-                .getBody();
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
     }
 
     /**
@@ -127,8 +137,8 @@ public class JwtService {
      *
      * @return ключ
      */
-    private Key getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(JWT_SIGNING_KEY);
+    private SecretKey getSigningKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(key);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

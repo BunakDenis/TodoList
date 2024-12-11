@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -45,7 +47,7 @@ public class UserService {
      */
     public User getByUsername(String username) {
         return repository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
+                .orElseThrow(() -> new UsernameNotFoundException("User is not found"));
 
     }
 
@@ -56,7 +58,7 @@ public class UserService {
      */
     public User getByUserId(int id) {
         return repository.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
+                .orElseThrow(() -> new UsernameNotFoundException("User is not found"));
 
     }
 
@@ -85,6 +87,9 @@ public class UserService {
             e.printStackTrace();
             return null;
         }
+    }
 
+    public List<User> getAll() {
+        return repository.findAll();
     }
 }

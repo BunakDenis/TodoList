@@ -1,14 +1,7 @@
 package global.goit.edu.todolist.config;
 
-import global.goit.edu.todolist.controller.filter.JwtCreateTokenFilter;
-import global.goit.edu.todolist.model.service.JwtService;
-import global.goit.edu.todolist.model.service.UserService;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
