@@ -3,16 +3,13 @@ package global.goit.edu.todolist.controller;
 import global.goit.edu.todolist.model.entity.note.Note;
 import global.goit.edu.todolist.model.entity.user.Role;
 import global.goit.edu.todolist.model.service.NoteService;
-import global.goit.edu.todolist.model.service.UserService;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
@@ -26,7 +23,9 @@ import java.util.List;
 public class NoteController {
 
     private final NoteService noteService;
-    private final UserService userService;
+
+    @Value("${home.url}")
+    private String homeUrl;
 
     @GetMapping("/list")
     public ModelAndView getList(HttpServletRequest request, HttpServletResponse response) {
@@ -49,7 +48,7 @@ public class NoteController {
         Note note = noteService.getById(id);
         noteService.delete(note);
 
-        RedirectView redirectView = new RedirectView("/note/list");
+        RedirectView redirectView = new RedirectView(homeUrl);
         return new ModelAndView(redirectView);
     }
 
@@ -65,11 +64,9 @@ public class NoteController {
     @PostMapping("/edit")
     public ModelAndView editNote(@ModelAttribute("note") Note note) {
 
-        if (noteService.getById(note.getId()) != null) {
-            noteService.save(note);
-        }
+        noteService.save(note);
 
-        RedirectView redirectView = new RedirectView("/note/list");
+        RedirectView redirectView = new RedirectView(homeUrl);
 
         return new ModelAndView(redirectView);
     }
@@ -77,25 +74,10 @@ public class NoteController {
     @PostMapping("/add")
     public ModelAndView addNote(@ModelAttribute("note") Note note) {
 
-        if (note != null) {
-            noteService.save(note);
-        }
+        noteService.create(note);
 
-        RedirectView redirectView = new RedirectView("/note/list");
+        RedirectView redirectView = new RedirectView(homeUrl);
 
         return new ModelAndView(redirectView);
-    }
-
-    @PostMapping ("/logout")
-    public ModelAndView logout(Authentication authentication, HttpServletRequest request, HttpServletResponse response) {
-
-        SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
-
-        logoutHandler.logout(request, response, authentication);
-
-        RedirectView redirectView = new RedirectView("/login");
-
-        return new ModelAndView(redirectView);
-
     }
 }

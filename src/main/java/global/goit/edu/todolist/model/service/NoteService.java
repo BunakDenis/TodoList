@@ -15,6 +15,20 @@ public class NoteService {
     private final NoteRepository noteRepository;
 
     public Note save(Note note) {
+        if (note == null){
+            throw new IllegalArgumentException("Note is null");
+        }
+        return noteRepository.save(note);
+    }
+
+    public Note create(Note note) {
+
+        boolean isNoteExists = noteRepository.existsById(note.getId());
+
+        if (isNoteExists) {
+            throw new IllegalArgumentException("Note with id=" + note.getId() + " is created");
+        }
+
         return noteRepository.save(note);
     }
 
@@ -23,16 +37,20 @@ public class NoteService {
     }
 
     public Note getById(long id) {
-        Optional<Note> result = noteRepository.findById(String.valueOf(id));
 
-        if (!result.isPresent()) {
+        if (!noteRepository.existsById(id)) {
             throw new IllegalArgumentException("Note with id=" + id + " not found");
         }
 
-        return result.get();
+        return noteRepository.findById(id).get();
     }
 
     public void delete(Note note) {
+
+        if (!noteRepository.existsById(note.getId())) {
+            throw new IllegalArgumentException("Note with id=" + note.getId() + " not found");
+        }
+
         noteRepository.delete(note);
     }
 
