@@ -35,8 +35,9 @@ public class NoteControllerTests {
 
     @Test
     public void testThatMethodGetListWorkOk() throws Exception {
-        Mockito.when(mockNoteService.getAll()).thenReturn(getNotes());
-        List<Note> all = noteService.getAll();
+        String username = "user";
+        Mockito.when(mockNoteService.getUserNotes(username)).thenReturn(getNotes());
+        List<Note> all = noteService.getUserNotes(username);
         all.forEach(System.out::println);
         mvc.perform(get("/note/list"))
                 .andExpect(status().isOk())
@@ -160,7 +161,7 @@ public class NoteControllerTests {
                 .content("Water is the more useful liquid than bear")
                 .build();
 
-        Mockito.when(mockNoteService.save(note)).thenReturn(note);
+        Mockito.when(mockNoteService.update(note)).thenReturn(note);
 
         RequestBuilder request = post("/note/add")
                 .param("id", String.valueOf(5L))

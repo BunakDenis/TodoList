@@ -1,0 +1,10 @@
+INSERT INTO users (username, password) VALUES
+('user', '$2a$12$kpU9BuqBbOyUvPo89aNRReiNFFSBYQ9zfecLhsTgYLlwFrHuisYoi'),
+('guess', '$2a$12$8fBcVfeeg2AKsFnAad5nF.0vMq6js0T7EGv/d4S2JPlDHOa4YhzSu');
+
+INSERT INTO notes (user_id, title, content) VALUES
+('user', 'Do Androids Dream of Electric Sheep?', 'It was January 2021, and Rick Deckard had a license to kill. Somewhere among the hordes of humans out there, lurked several rogue androids. Deckards assignment--find them and then...retire them. Trouble was, the androids all looked exactly like humans, and they didnt want to be found!'),
+('user', 'The Hitchhiker’s Guide to the Galaxy', 'Seconds before the Earth is demolished to make way for a galactic freeway, Arthur Dent is plucked off the planet by his friend Ford Prefect, a researcher for the revised edition of The Hitchhikers Guide to the Galaxy who, for the last fifteen years, has been posing as an out-of-work actor.'),
+('guess', 'Something Wicked This Way Comes', 'One of Ray Bradbury’s best-known and most popular novels, Something Wicked This Way Comes, now featuring a new introduction and material about its longstanding influence on culture and genre.'),
+('guess', 'A Story of Yesterday', 'A Story of Yesterday is a concise and straight punch to the jaw of life.Under a sky of different colors germinates a magical story of survival, where the result of each choice, enclosed in this particular tale, will snatch the whereabouts of each story forever.'),
+('guess', 'To Kill a Mockingbird', 'The unforgettable novel of a childhood in a sleepy Southern town and the crisis of conscience that rocked it. To Kill A Mockingbird became both an instant bestseller and a critical success when it was first published in 1960. It went on to win the Pulitzer Prize in 1961 and was later made into an Academy Award-winning film, also a classic.');

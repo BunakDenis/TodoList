@@ -1,5 +1,6 @@
 package global.goit.edu.todolist.model.service;
 
+import global.goit.edu.todolist.model.entity.message.AuthMessage;
 import global.goit.edu.todolist.model.entity.user.User;
 import global.goit.edu.todolist.controller.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +9,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -15,11 +19,11 @@ public class UserService {
     private final UserRepository repository;
 
     /**
-     * Сохранение пользователя
+     * Обновление данных пользователя
      *
      * @return сохраненный пользователь
      */
-    public User save(User user) {
+    public User update(User user) {
         return repository.save(user);
     }
 
@@ -31,11 +35,15 @@ public class UserService {
      */
     public User create(User user) {
         if (repository.existsByUsername(user.getUsername())) {
-            // Заменить на свои исключения
-            throw new IllegalArgumentException("Пользователь с таким именем уже существует");
+            throw new IllegalArgumentException(AuthMessage.userAlreadyExists.name());
         }
-
-        return save(user);
+        if (user.getUsername().length() < 5) {
+            throw new IllegalArgumentException(AuthMessage.invalidUsername.name());
+        }
+        if (user.getPassword().length() < 5) {
+            throw new IllegalArgumentException(AuthMessage.invalidPassword.name());
+        }
+        return update(user);
     }
 
     /**
@@ -44,20 +52,13 @@ public class UserService {
      * @return пользователь
      */
     public User getByUsername(String username) {
-        return repository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
 
-    }
+        Optional<User> result = repository.findById(username);
 
-    /**
-     * Получение пользователя по id пользователя
-     *
-     * @return пользователь
-     */
-    public User getByUserId(int id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден"));
-
+        if (!result.isPresent()) {
+            throw new UsernameNotFoundException("User with name - " + username + " is not found");
+        }
+        return result.get();
     }
 
     /**
@@ -86,4 +87,13 @@ public class UserService {
             return null;
         }
     }
+
+    public boolean isExistsByUsername(String username) {
+        return repository.existsByUsername(username);
+    }
+
+    public List<User> getAll() {
+        return repository.findAll();
+    }
+
 }

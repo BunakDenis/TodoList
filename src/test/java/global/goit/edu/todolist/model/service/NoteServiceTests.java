@@ -3,7 +3,6 @@ package global.goit.edu.todolist.model.service;
 import global.goit.edu.todolist.TodoListTestBaseClass;
 import global.goit.edu.todolist.model.entity.note.Note;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.Test;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +29,7 @@ public class NoteServiceTests extends TodoListTestBaseClass {
     @Order(1)
     public void testMethodSaveWorkOk() {
         //When
-        Note actual = noteService.save(expected);
+        Note actual = noteService.update(expected);
         //Then
         Assertions.assertEquals(expected.getId(), actual.getId());
         Assertions.assertEquals(expected.getTitle(), actual.getTitle());
@@ -72,12 +71,12 @@ public class NoteServiceTests extends TodoListTestBaseClass {
     public void testThatMethodSaveUpdateData() {
 
         //Given
-        Note expectedForTestingUpdate = noteService.save(expected);
+        Note expectedForTestingUpdate = noteService.update(expected);
         expectedForTestingUpdate.setTitle("Mathematics");
         expectedForTestingUpdate.setContent("No mathematics is the best subject in the world!");
 
         //When
-        noteService.save(expectedForTestingUpdate);
+        noteService.update(expectedForTestingUpdate);
         Note actual = noteService.getById(1L);
 
         //Then
@@ -91,8 +90,11 @@ public class NoteServiceTests extends TodoListTestBaseClass {
     @Order(5)
     public void testThatMethodGetAllWorkOk() {
 
+        //Given
+        String username = "user";
+
         //When
-        List<Note> actual = noteService.getAll();
+        List<Note> actual = noteService.getUserNotes(username);
 
         //Then
         Assertions.assertEquals(6, actual.size());
@@ -101,10 +103,12 @@ public class NoteServiceTests extends TodoListTestBaseClass {
     @Test
     @Order(6)
     public void testThatMethodDeleteWorkOk() {
+        //Given
+        String username = "user";
 
         //When
         noteService.delete(expected);
-        List<Note> actual = noteService.getAll();
+        List<Note> actual = noteService.getUserNotes(username);
 
         //Then
         Assertions.assertFalse(actual.contains(expected));

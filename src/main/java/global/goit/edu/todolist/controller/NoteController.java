@@ -1,21 +1,20 @@
 package global.goit.edu.todolist.controller;
 
+
+import global.goit.edu.todolist.model.entity.dto.note.NoteRequest;
+import global.goit.edu.todolist.model.entity.dto.note.NoteResponse;
+import global.goit.edu.todolist.model.entity.dto.oparation.Operation;
+import global.goit.edu.todolist.model.entity.message.NoteMessage;
 import global.goit.edu.todolist.model.entity.note.Note;
-import global.goit.edu.todolist.model.entity.user.Role;
+import global.goit.edu.todolist.model.entity.user.User;
 import global.goit.edu.todolist.model.service.NoteService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import global.goit.edu.todolist.model.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.view.RedirectView;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/note")
@@ -23,61 +22,77 @@ import java.util.List;
 public class NoteController {
 
     private final NoteService noteService;
+    private final UserService userService;
 
     @Value("${home.url}")
     private String homeUrl;
 
+    @PostMapping("/add")
+    public NoteResponse addNote(@RequestBody NoteRequest request) {
+
+        User currentUser = userService.getCurrentUser();
+
+        Note note = noteService.create(Note.builder()
+                .user(currentUser)
+                .title(request.getTitle())
+                .content(request.getContent())
+                .build()
+        );
+
+        return NoteResponse.success(Operation.CREATE, List.of(note));
+    }
+
     @GetMapping("/list")
-    public ModelAndView getList(HttpServletRequest request, HttpServletResponse response) {
-        ModelAndView result = new ModelAndView("note/list");
+    public NoteResponse getAllNotes() {
+        User currentUser = userService.getCurrentUser();
 
-        SecurityContext context = SecurityContextHolder.getContext();
+        List<Note> userNotes = currentUser.getNotes();
 
-        Collection<? extends GrantedAuthority> authorities = context.getAuthentication().getAuthorities();
-
-        boolean isAdmin = authorities.stream().anyMatch(a -> a.toString().equals(Role.ADMIN.toString()));
-
-        List<Note> notes = noteService.getAll();
-        result.addObject("role", isAdmin);
-        result.addObject("notes", notes);
-        return result;
+        return NoteResponse.success(Operation.READ, userNotes);
     }
 
-    @PostMapping("/delete/{id}")
-    public ModelAndView deleteById(@PathVariable long id) {
-        Note note = noteService.getById(id);
-        noteService.delete(note);
+    @GetMapping("/get/{id}")
+    public NoteResponse getNotePage(@PathVariable long id) {
+        Note note = new Note();
 
-        RedirectView redirectView = new RedirectView(homeUrl);
-        return new ModelAndView(redirectView);
-    }
+        note = noteService.findNoteByIdInCurrentUser(id);
 
-    @GetMapping("/edit/{id}")
-    public ModelAndView editNotePage(@PathVariable long id) {
-        ModelAndView result = new ModelAndView("note/edit");
-        Note note = noteService.getById(id);
-
-        result.addObject("note", note);
-        return result;
+        if (Objects.isNull(note)) {
+            return NoteResponse.failed(Operation.READ, NoteMessage.invalidNoteId);
+        }
+        return NoteResponse.success(Operation.READ, List.of(note));
     }
 
     @PostMapping("/edit")
-    public ModelAndView editNote(@ModelAttribute("note") Note note) {
+    public NoteResponse editNote(@RequestBody NoteRequest request) {
+        Note note = new Note();
 
-        noteService.save(note);
+        note = noteService.findNoteByIdInCurrentUser(request.getId());
 
-        RedirectView redirectView = new RedirectView(homeUrl);
+        if (Objects.isNull(note)) {
+            return NoteResponse.failed(Operation.UPDATE, NoteMessage.invalidNoteId);
+        }
 
-        return new ModelAndView(redirectView);
+        note.setTitle(request.getTitle());
+        note.setContent(request.getContent());
+
+        Note result = noteService.update(note);
+
+        return NoteResponse.success(Operation.UPDATE, List.of(result));
     }
 
-    @PostMapping("/add")
-    public ModelAndView addNote(@ModelAttribute("note") Note note) {
+    @PostMapping("/delete/{id}")
+    public NoteResponse deleteById(@PathVariable long id) {
+        Note note = new Note();
 
-        noteService.create(note);
+        note = noteService.findNoteByIdInCurrentUser(id);
 
-        RedirectView redirectView = new RedirectView(homeUrl);
+        if (Objects.isNull(note)) {
+            return NoteResponse.failed(Operation.DELETE, NoteMessage.invalidNoteId);
+        }
 
-        return new ModelAndView(redirectView);
+        noteService.delete(note);
+
+        return NoteResponse.success(Operation.DELETE, List.of(note));
     }
 }

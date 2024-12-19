@@ -11,11 +11,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.*;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.*;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -26,10 +27,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class MySecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtService jwtService;
     private final UserService userService;
     private final CookieService cookieService;
+    private final AuthenticationConfiguration authenticationConfiguration;
     @Value("${cookie.token.header.name}")
     private String cookieHeaderName;
 
@@ -38,45 +39,28 @@ public class MySecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> {
-                            request.requestMatchers("/login").permitAll()
+                            request.requestMatchers("/auth/**").permitAll()
                                     .anyRequest().authenticated();
                         }
 
                 )
-                .formLogin(form -> {
-                    form
-                            .successHandler((request, response, authentication) -> {
-                                // После успешной авторизации создаём токен и добавляем его в Cookie
-                                User currentUser = userService.getCurrentUser();
-                                String token = jwtService.generateToken(currentUser);
-                                cookieService.addToken(response, token);
-                                response.sendRedirect("/note/list");
-                            }).permitAll();
-                })
-                .logout(logout -> {
-                    logout.deleteCookies(cookieHeaderName)
-                            .logoutSuccessUrl("/login");
-                })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(
+                        new JwtAuthenticationFilter(authenticationManager(), userService, jwtService, cookieService),
+                        UsernamePasswordAuthenticationFilter.class
+                );
 
         return http.build();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        AuthenticationManagerBuilder authenticationManagerBuilder =
-                http.getSharedObject(AuthenticationManagerBuilder.class);
-
-        authenticationManagerBuilder
-                .userDetailsService(userService.userDetailsService())
-                .passwordEncoder(passwordEncoder());
-
-        return authenticationManagerBuilder.getOrBuild();
+    public AuthenticationManager authenticationManager()
+            throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 }

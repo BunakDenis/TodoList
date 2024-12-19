@@ -6,15 +6,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class NoteService {
 
     private final NoteRepository noteRepository;
+    private final UserService userService;
 
-    public Note save(Note note) {
+    public Note update(Note note) {
         if (note == null){
             throw new IllegalArgumentException("Note is null");
         }
@@ -22,18 +22,12 @@ public class NoteService {
     }
 
     public Note create(Note note) {
-
-        boolean isNoteExists = noteRepository.existsById(note.getId());
-
-        if (isNoteExists) {
-            throw new IllegalArgumentException("Note with id=" + note.getId() + " is created");
-        }
-
         return noteRepository.save(note);
     }
 
-    public List<Note> getAll() {
-        return noteRepository.findAll();
+    public List<Note> getUserNotes(String username) {
+        List<Note> userNotes = noteRepository.getUserNotes(username);
+        return userNotes;
     }
 
     public Note getById(long id) {
@@ -43,6 +37,18 @@ public class NoteService {
         }
 
         return noteRepository.findById(id).get();
+    }
+
+    public Note findNoteByIdInCurrentUser(long id) {
+        Note result = new Note();
+        for (Note n : userService.getCurrentUser().getNotes()) {
+
+            if (n.getId() == id) {
+                result = n;
+                break;
+            }
+        }
+        return result;
     }
 
     public void delete(Note note) {
