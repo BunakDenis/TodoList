@@ -10,6 +10,9 @@ import java.util.List;
 @Repository
 public interface NoteRepository extends JpaRepository<Note, Long> {
 
-    @Query(nativeQuery = true, value = "SELECT * FROM note n WHERE n.user_id = :username")
+    @Query(nativeQuery = true, value = "SELECT * FROM notes n WHERE n.user_id = :username")
     List<Note> getUserNotes(String username);
+
+    boolean existsByTitle(String title);
+    boolean existsByContent(String content);
 }

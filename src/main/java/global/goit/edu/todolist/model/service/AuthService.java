@@ -49,7 +49,6 @@ public class AuthService {
                                HttpServletRequest httpServletRequest,
                                HttpServletResponse httpServletResponse) {
 
-        userService.getAll().forEach(System.out::println);
         if (!userService.isExistsByUsername(request.getUsername())) {
             return LoginResponse.loginFail(AuthMessage.invalidUsername);
         }
@@ -72,12 +71,11 @@ public class AuthService {
         SecurityContextHolder.setContext(context);
 
         String token = jwtService.generateToken(userService.getCurrentUser());
-        String tokenForRequest = "Token is in cookie";
 
         cookieService.setExpirationTimeByZeroToToken(httpServletRequest, httpServletResponse);
         cookieService.addToken(httpServletResponse, token);
 
-        return LoginResponse.loginSuccess(tokenForRequest);
+        return LoginResponse.loginSuccess(token);
     }
 
 }

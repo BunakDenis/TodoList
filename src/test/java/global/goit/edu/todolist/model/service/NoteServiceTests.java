@@ -1,7 +1,9 @@
 package global.goit.edu.todolist.model.service;
 
 import global.goit.edu.todolist.TodoListTestBaseClass;
+import global.goit.edu.todolist.model.entity.message.NoteMessage;
 import global.goit.edu.todolist.model.entity.note.Note;
+import global.goit.edu.todolist.model.entity.user.User;
 import org.junit.jupiter.api.*;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
@@ -19,42 +21,120 @@ public class NoteServiceTests extends TodoListTestBaseClass {
     @BeforeAll
     public static void beforeAll() {
         expected = Note.builder()
-                .id(1L)
+                .id(3L)
+                .user(
+                        User.builder()
+                                .username("test_user")
+                                .password("$2a$12$kpU9BuqBbOyUvPo89aNRReiNFFSBYQ9zfecLhsTgYLlwFrHuisYoi")
+                                .build()
+                )
                 .title("Geodesy")
                 .content("Geodesy is the best subject in the world")
                 .build();
     }
 
     @Test
+    @Sql(value = "/data.sql")
     @Order(1)
-    public void testMethodSaveWorkOk() {
+    public void testMethodCreateWorkOk() {
         //When
-        Note actual = noteService.update(expected);
+        Note actual = noteService.create(expected);
+
         //Then
         Assertions.assertEquals(expected.getId(), actual.getId());
+        Assertions.assertEquals(expected.getUser().getUsername(), "test_user");
         Assertions.assertEquals(expected.getTitle(), actual.getTitle());
         Assertions.assertEquals(expected.getContent(), actual.getContent());
     }
 
     @Test
     @Order(2)
+    public void testThatMethodCreateThrowExceptionNoteAlreadyExists() {
+        String expectedMessage = NoteMessage.noteAlreadyExists.name();
+        Note note = noteService.getById(1);
+
+        String actualMessage = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            noteService.create(note);
+        }).getMessage();
+
+        Assertions.assertEquals(expectedMessage, actualMessage);
+
+    }
+
+    @Test
+    @Order(3)
+    public void testThatMethodCreateThrowExceptionWithMessageInvalidTitle() {
+
+        //Given
+        String expectedMessage = NoteMessage.invalidTitle.name();
+        Note note = Note.builder()
+                .user(
+                        User.builder()
+                                .username("test_user")
+                                .password("$2a$12$kpU9BuqBbOyUvPo89aNRReiNFFSBYQ9zfecLhsTgYLlwFrHuisYoi")
+                                .build()
+                )
+                .title("Geo")
+                .content("Geodesy is the best subject in the world")
+                .build();
+
+        //When
+        String actualMessage = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            noteService.create(note);
+        }).getMessage();
+
+        //Then
+        Assertions.assertEquals(actualMessage, expectedMessage);
+
+    }
+
+    @Test
+    @Order(4)
+    public void testThatMethodCreateThrowExceptionWithMessageInvalidContent() {
+
+        //Given
+        String expectedMessage = NoteMessage.invalidContent.name();
+        Note note = Note.builder()
+                .user(
+                        User.builder()
+                                .username("test_user")
+                                .password("$2a$12$kpU9BuqBbOyUvPo89aNRReiNFFSBYQ9zfecLhsTgYLlwFrHuisYoi")
+                                .build()
+                )
+                .title("Geodesy")
+                .content("Geo")
+                .build();
+
+        //When
+        String actualMessage = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            noteService.create(note);
+        }).getMessage();
+
+        //Then
+        Assertions.assertEquals(actualMessage, expectedMessage);
+
+    }
+
+    @Test
+    @Order(5)
     public void testThatMethodGetByIdWorkOk() {
 
         //When
-        Note actual = noteService.getById(1L);
+        Note actual = noteService.getById(3L);
 
         //Then
         Assertions.assertEquals(expected.getId(), actual.getId());
+        Assertions.assertEquals(expected.getUser().getUsername(), actual.getUser().getUsername());
         Assertions.assertEquals(expected.getTitle(), actual.getTitle());
         Assertions.assertEquals(expected.getContent(), actual.getContent());
     }
 
     @Test
-    @Order(3)
+    @Order(6)
     public void testThatMethodGetByIdThrowException() {
 
         //Given
-        String expectedMessage = "Note with id=20 not found";
+        String expectedMessage = NoteMessage.invalidNoteId.name();
 
         //When
         IllegalArgumentException actual = Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -67,44 +147,62 @@ public class NoteServiceTests extends TodoListTestBaseClass {
     }
 
     @Test
-    @Order(4)
-    public void testThatMethodSaveUpdateData() {
+    @Order(7)
+    public void testThatMethodUpdateDataWorkOk() {
 
         //Given
-        Note expectedForTestingUpdate = noteService.update(expected);
+        Note expectedForTestingUpdate = noteService.getById(3L);
         expectedForTestingUpdate.setTitle("Mathematics");
         expectedForTestingUpdate.setContent("No mathematics is the best subject in the world!");
 
         //When
         noteService.update(expectedForTestingUpdate);
-        Note actual = noteService.getById(1L);
+        Note actual = noteService.getById(3L);
 
         //Then
         Assertions.assertEquals(expectedForTestingUpdate.getId(), actual.getId());
+        Assertions.assertEquals(expectedForTestingUpdate.getUser().getUsername(), actual.getUser().getUsername());
         Assertions.assertEquals(expectedForTestingUpdate.getTitle(), actual.getTitle());
         Assertions.assertEquals(expectedForTestingUpdate.getContent(), actual.getContent());
     }
 
     @Test
-    @Sql(value = "/data.sql")
-    @Order(5)
-    public void testThatMethodGetAllWorkOk() {
+    @Order(8)
+    public void testThatMethodUpdateThrowExceptionWithMessageInvalidNoteId() {
 
         //Given
-        String username = "user";
+        String expectedMessage = NoteMessage.invalidNoteId.name();
+        Note note = new Note();
+
+        //When
+        String actualMessage = Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            noteService.update(note);
+        }).getMessage();
+
+        //Then
+        Assertions.assertEquals(actualMessage, expectedMessage);
+
+    }
+
+    @Test
+    @Order(9)
+    public void testThatMethodGetUserNotesWorkOk() {
+
+        //Given
+        String username = "test_user";
 
         //When
         List<Note> actual = noteService.getUserNotes(username);
 
         //Then
-        Assertions.assertEquals(6, actual.size());
+        Assertions.assertEquals(3, actual.size());
     }
 
     @Test
-    @Order(6)
+    @Order(10)
     public void testThatMethodDeleteWorkOk() {
         //Given
-        String username = "user";
+        String username = "test_user";
 
         //When
         noteService.delete(expected);

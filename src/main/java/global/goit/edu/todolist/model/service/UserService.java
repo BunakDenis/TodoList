@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,16 +35,17 @@ public class UserService {
      * @return созданный пользователь
      */
     public User create(User user) {
+
         if (repository.existsByUsername(user.getUsername())) {
             throw new IllegalArgumentException(AuthMessage.userAlreadyExists.name());
         }
-        if (user.getUsername().length() < 5) {
+        if (user.getUsername().length() < 3) {
             throw new IllegalArgumentException(AuthMessage.invalidUsername.name());
         }
         if (user.getPassword().length() < 5) {
             throw new IllegalArgumentException(AuthMessage.invalidPassword.name());
         }
-        return update(user);
+        return repository.save(user);
     }
 
     /**

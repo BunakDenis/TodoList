@@ -7,14 +7,14 @@ import lombok.Data;
 @Data
 public class RegisterResponse {
 
-    private AuthMessage authMessage;
+    private AuthMessage message;
 
     public static RegisterResponse registrationSuccess() {
-        return builder().authMessage(AuthMessage.ok).build();
+        return builder().message(AuthMessage.ok).build();
     }
 
     public static RegisterResponse registerFail(AuthMessage authMessage) {
-        return builder().authMessage(authMessage).build();
+        return builder().message(authMessage).build();
     }
 
 }

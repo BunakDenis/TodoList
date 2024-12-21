@@ -13,8 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
+
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/note")
@@ -29,36 +29,56 @@ public class NoteController {
 
     @PostMapping("/add")
     public NoteResponse addNote(@RequestBody NoteRequest request) {
+        User currentUser = new User();
+        Note note = new Note();
+        try {
+            currentUser = userService.getCurrentUser();
+        } catch (Exception e) {
+            return NoteResponse.failed(Operation.CREATE, NoteMessage.valueOf(e.getMessage()));
+        }
 
-        User currentUser = userService.getCurrentUser();
-
-        Note note = noteService.create(Note.builder()
-                .user(currentUser)
-                .title(request.getTitle())
-                .content(request.getContent())
-                .build()
-        );
+        try {
+            note = noteService.create(Note.builder()
+                    .user(currentUser)
+                    .title(request.getTitle())
+                    .content(request.getContent())
+                    .build()
+            );
+        } catch (IllegalArgumentException e) {
+            return NoteResponse.failed(Operation.CREATE, NoteMessage.valueOf(e.getMessage()));
+        }
 
         return NoteResponse.success(Operation.CREATE, List.of(note));
     }
 
     @GetMapping("/list")
     public NoteResponse getAllNotes() {
-        User currentUser = userService.getCurrentUser();
+        User currentUser = new User();
+        List<Note> result;
 
-        List<Note> userNotes = currentUser.getNotes();
+        try {
+            currentUser = userService.getCurrentUser();
+        } catch (Exception e) {
+            return NoteResponse.failed(Operation.READ, NoteMessage.valueOf(e.getMessage()));
+        }
 
-        return NoteResponse.success(Operation.READ, userNotes);
+        try {
+            result = noteService.getUserNotes(currentUser.getUsername());
+        } catch (IllegalArgumentException e) {
+            return NoteResponse.failed(Operation.READ, NoteMessage.invalidUsername);
+        }
+
+        return NoteResponse.success(Operation.READ, result);
     }
 
     @GetMapping("/get/{id}")
-    public NoteResponse getNotePage(@PathVariable long id) {
+    public NoteResponse getNote(@PathVariable long id) {
         Note note = new Note();
 
-        note = noteService.findNoteByIdInCurrentUser(id);
-
-        if (Objects.isNull(note)) {
-            return NoteResponse.failed(Operation.READ, NoteMessage.invalidNoteId);
+        try {
+            note = noteService.findNoteByIdInCurrentUser(id);
+        } catch (IllegalArgumentException e) {
+            return NoteResponse.failed(Operation.READ, NoteMessage.valueOf(e.getMessage()));
         }
         return NoteResponse.success(Operation.READ, List.of(note));
     }
@@ -67,9 +87,9 @@ public class NoteController {
     public NoteResponse editNote(@RequestBody NoteRequest request) {
         Note note = new Note();
 
-        note = noteService.findNoteByIdInCurrentUser(request.getId());
-
-        if (Objects.isNull(note)) {
+        try {
+            note = noteService.findNoteByIdInCurrentUser(request.getId());
+        } catch (IllegalArgumentException e) {
             return NoteResponse.failed(Operation.UPDATE, NoteMessage.invalidNoteId);
         }
 
@@ -85,9 +105,9 @@ public class NoteController {
     public NoteResponse deleteById(@PathVariable long id) {
         Note note = new Note();
 
-        note = noteService.findNoteByIdInCurrentUser(id);
-
-        if (Objects.isNull(note)) {
+        try {
+            note = noteService.findNoteByIdInCurrentUser(id);
+        } catch (IllegalArgumentException e) {
             return NoteResponse.failed(Operation.DELETE, NoteMessage.invalidNoteId);
         }
 
